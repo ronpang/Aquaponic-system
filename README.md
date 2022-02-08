@@ -1,6 +1,7 @@
 # Aquaponic-system
 Monitoring the values of the aquaponic and controls the fishing pump
 
+![][link-aquaimg]
 ## Monitoring
 There are few important values required to monitor.
 
@@ -52,6 +53,7 @@ Reference:
 2. [ORP research][link-research 2]
 
 
+[link-aquaimg]: https://github.com/ronpang/Aquaponic-system/blob/main/IMG_0124.JPG
 [link-aquapros]: https://www.youtube.com/watch?v=v1vIyGf9kRI
 [link-research 1]: https://learn.eartheasy.com/articles/how-to-grow-with-aquaponics-in-5-simple-steps/
 [link-aquapros1]: https://www.youtube.com/watch?v=dFk6m-1zxyE

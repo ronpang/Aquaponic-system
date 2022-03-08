@@ -1,7 +1,15 @@
-# Aquaponic-system
-Monitoring the values of the aquaponic and controls the fishing pump
+# Aquaponic system
+This system has used Raspberry Pi Pico to develop in circuitpython.
+
+This aquaponic system has used circuitpython coding with adafruit's and WIZnet reference code to develop.
+
+Reference code:
+1. [WIZnet]
+2. [Adafruit]
+3. [Circuitpython]
 
 ![][link-aquaimg]
+
 ## Monitoring
 There are few important values required to monitor.
 
@@ -53,7 +61,7 @@ Reference:
 2. [ORP research][link-research 2]
 
 
-[link-aquaimg]: https://github.com/ronpang/Aquaponic-system/blob/main/IMG_0124.JPG
+[link-aquaimg]: https://github.com/ronpang/Aquaponic-system/blob/main/IMG_0154.JPG
 [link-aquapros]: https://www.youtube.com/watch?v=v1vIyGf9kRI
 [link-research 1]: https://learn.eartheasy.com/articles/how-to-grow-with-aquaponics-in-5-simple-steps/
 [link-aquapros1]: https://www.youtube.com/watch?v=dFk6m-1zxyE

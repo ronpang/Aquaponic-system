@@ -1,21 +1,108 @@
 # Aquaponic system
-This system has used Raspberry Pi Pico to develop in circuitpython.
+By using WIZNet's W5100S-EVB-PICO, this aquaponic system has used circuitpython coding with adafruit's and WIZnet reference code to develop.
 
-This aquaponic system has used circuitpython coding with adafruit's and WIZnet reference code to develop.
+Most of the monitoring procedure and controls could be handle throguh adafruit IO 
 
 Reference code:
-1. [WIZnet]
-2. [Adafruit]
-3. [Circuitpython]
+1. [WIZnet][link-WIZnet circuitpython]
+2. [Adafruit][link-adafruit]
+3. [Circuitpython][link-circuitpython]
 
 ![][link-aquaimg]
 
-## Monitoring
-There are few important values required to monitor.
+## Why use circuitpython and how to setup
+The reason for using circuitpython is adafruit and circuitpython provided a lot of reference source code that I could easily to implement.
 
-1. PH values
-2. ORP values
-3. Temperature
+It also could easily changed to different MCU with the same platform (It required to use WIZnet's [IO module][link-iomodule] on other MCU solutions)
+
+For how to setup circuitpython to W5100S-EVB-PICO, please refer the links below.
+
+1. [Setup link 1][link-setup from plant]
+2. [Setup link 2][link-setup from general] 
+
+## Communication Method
+The communication method fo this aquaponic system has used Adafruit IO for monitoring and control purpose.
+
+The protocol that has been used in this system is using MQTT protocol. 
+
+For more information, please refer to the link below.
+
+1. [Adafruit IO communication link][link-setup from plant]
+
+## System design diagram
+THe aquaponic system is using few monitor features with a simple physic on fluid flow
+![][link-flow diagram]
+
+### Main flow
+1. Pumping water up to the plantation section to provide water and food (Nitrate)
+2. Plantation will absorb the water and drop back to the plantation tank
+3. PH and ORP sensors will record the water values. (This section is could collect stable result - without vibration)
+4. By using platsic tubes, Water will flow from the plantation section back to the fish tank
+
+### Others
+1. LED is providing the best lightwave for the plants to grow
+2. Temperature sensor is to ensure the temperature of the fish tank is suitable for fish to live
+
+### Error Prevention
+1. Water level sensor is preventing the water on the plantation section has overflow
+
+## Connection Diagram
+
+![][link-connection diagram]
+
+### Digital IO
+1. Water Temperature sensor (DS18S20) - Powered by PH sensor (GP0)
+2. Water level sensor (GP1)
+3. Pump - Using relay to control the pump (GP2)
+4. LED light control - Using relay to act as switch (GP3) 
+
+### Analogue IO
+1. PH - Reads the PH level (A0)
+2. ORP - Reads the ORP level (A1)
+
+## Monitoring
+There are few important values required to monitor. These varibales is ensuring the fish tank and plants could have a good environment to live.
+
+1. PH values - Measure the PH values from 0 - 14 ([link][link-PH])
+2. ORP values - Measire the ORP values from -2000mV - 2000mV ([link][link-ORP])
+3. Temperature - Measure the Temperature by using DS18S20 onebus module ([link][link-PH])
+
+## Control
+Simple controls for ensuring the system could work normally
+
+1. Pump - special for fish tanks (USB power) ([link][link-fishpump])
+2. LED light - found a specific for plantation purpose LED light (Purple) ([link][link-led])
+      1. If you want to upgraded into a neopixel version, please go to the ([link][link-neopixel])
+
+## Error prevention
+Error May accor:
+1. Water pump will still provide power pumping after the software section shows error
+2. Plastic tubes for returning water back to fish tank may have a chance to have blockage
+
+Solution:
+1. Water level sensor to detect the water level to prevent overflow
+2. If there are software error created, turn off the water pump
+
+
+## Software
+### Bundles:
+1. [Circuit Python 7.0][link-circuit python] (it required to use 1 MB from the flash) 
+2. [Adafruit circuit python bundle][link-adafruit] - Use the latest version from adafruit bundle page
+3. [WIZnet's circuit python bundle][link-wiznet] - Use the latest version from WIZnet bundle page
+
+### Required Libraries from adafruit bundle:
+1. adafruit_bus_services folder
+2. adafruit_io folder
+3. adafruit_minimqtt folder
+4. adafruit_wiznet5k folder
+5. adafruit_onewire folder
+6. adafruit_request
+7. adafruit_ds18x20
+
+## Coding setup
+If you wanted to know the coding method for adafruit IO, please refer the link below.
+
+[Adafruit IO communication procedue][link-setup from plant]
 
 ## PH value
 PH values related to the ratio between the ammonia(NH3) to ammonium (NH4+)
@@ -60,7 +147,55 @@ Reference:
 1. [Aquapros - nitrates][link-aquapros1]
 2. [ORP research][link-research 2]
 
+##Coding method:
+1. Collecting data (200 samples)
+```python
+    def collection (self,choice):
+        for i in range(self.sample): #sample size is 200 
+            if choice == 'PH': # check what kind of data are you recording
+                temp = int(PH.value) # collect data from A0
+            elif choice == 'ORP': 
+                temp = int(ORP.value) # collect data from A1
+            else:
+                print("error")
+            self.data.append(temp) #saved data in a array
+            time.sleep(0.02)
+```
+2. Calculation for PH values and ORP values
+```python
+   def calculation (self,choice):
+        if len(self.data) == self.sample:
+            self.total = sum(self.data)
+            self.average = int(self.total/len(self.data)/64)
+            if choice == 'PH':
+                value = ((self.average*3300/1024)+self.ph_min)/1000
+                actual = -5.741*value +16.654
+                print(value)
+            elif choice == 'ORP':
+                value = int(((self.average*3.3*1000/1024)+self.orp_min))
+                actual = (value-self.mid) /2.9
+                print(value)
+            self.average = 0
+            self.total = 0
+            self.data.clear()
+            return actual
+```
 
+
+
+[link-WIZnet circuitpython]:https://github.com/Wiznet/RP2040-HAT-CircuitPython
+[link-adafruit]:https://github.com/adafruit/Adafruit_CircuitPython_Bundle
+[link-circuitpython]: https://circuitpython.org/
+[link-iomodule]: https://www.wiznet.io/product/network-module/
+[link-setup from plant]:https://github.com/ronpang/Smart-Plant-WIZnet-Ethernet-HAT-Raspberry-PI-PICO-
+[link-setup from general]: https://github.com/Wiznet/RP2040-HAT-CircuitPython/blob/master/Ethernet%20Example%20Getting%20Started%20%5BCircuitpython%5D.md
+[link-flow diagram]: https://github.com/ronpang/Aquaponic-system/blob/main/aquaponic%20system%20structure.PNG
+[link-connection diagram]: https://github.com/ronpang/Aquaponic-system/blob/main/aquaponic%20connection%20diagram.PNG
+[link-PH]: https://item.taobao.com/item.htm?spm=a230r.1.14.16.10341e49n9vO3m&id=608203826244&ns=1&abbucket=9#detail
+[link-ORP]: https://item.taobao.com/item.htm?spm=a230r.1.14.20.647f6566nldcXV&id=614953359192&ns=1&abbucket=9#detail
+[link-fishpump]: https://item.taobao.com/item.htm?spm=a230r.1.14.16.63591ab6OsFyqX&id=612904638950&ns=1&abbucket=6#detail
+[link-led]: https://item.taobao.com/item.htm?spm=a230r.1.14.38.5b5677edy8OI2q&id=642558377399&ns=1&abbucket=6#detail
+[link-neopixel]: https://github.com/ronpang/WIZnet-HK_Ron/blob/main/Adafruit%20io/Adafruit%20io%20(pixel%20light%20control).py
 [link-aquaimg]: https://github.com/ronpang/Aquaponic-system/blob/main/IMG_0154.JPG
 [link-aquapros]: https://www.youtube.com/watch?v=v1vIyGf9kRI
 [link-research 1]: https://learn.eartheasy.com/articles/how-to-grow-with-aquaponics-in-5-simple-steps/

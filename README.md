@@ -102,7 +102,7 @@ Solution:
 ## Coding setup
 If you wanted to know the coding method for adafruit IO, please refer the link below.
 
-[Adafruit IO communication procedue][link-setup from plant]
+[Adafruit IO communication procedure][link-setup from plant]
 
 ## PH value
 PH values related to the ratio between the ammonia(NH3) to ammonium (NH4+)
@@ -147,7 +147,7 @@ Reference:
 1. [Aquapros - nitrates][link-aquapros1]
 2. [ORP research][link-research 2]
 
-##Coding method:
+## Coding method
 1. Collecting data (200 samples)
 ```python
     def collection (self,choice):
@@ -164,22 +164,77 @@ Reference:
 2. Calculation for PH values and ORP values
 ```python
    def calculation (self,choice):
-        if len(self.data) == self.sample:
-            self.total = sum(self.data)
-            self.average = int(self.total/len(self.data)/64)
-            if choice == 'PH':
-                value = ((self.average*3300/1024)+self.ph_min)/1000
-                actual = -5.741*value +16.654
+        if len(self.data) == self.sample: # check the sample size is it 200
+            self.total = sum(self.data) #add all the samples 
+            self.average = int(self.total/len(self.data)/64) #calculate average and set it into 1024 bit ( 5 bytes), the sensor modules was designed for arduino solution 
+            if choice == 'PH': #check the input value 
+                value = ((self.average*3300/1024)+self.ph_min)/1000 # calculate the actual inupt voltage
+                actual = -5.741*value +16.654 # covert to PH value
                 print(value)
             elif choice == 'ORP':
-                value = int(((self.average*3.3*1000/1024)+self.orp_min))
-                actual = (value-self.mid) /2.9
+                value = int(((self.average*3.3*1000/1024)+self.orp_min)) #calcuate the actual input voltage
+                actual = (value-self.mid) /2.9 #convert to ORP value
                 print(value)
             self.average = 0
             self.total = 0
             self.data.clear()
-            return actual
+            return actual #return the calucated PH / ORP value
 ```
+3. Error prevention
+```python
+#Inside the while loop
+#When there are not errors
+ try: 
+            
+            alarm=pump_sensor() # Read the water level sensor
+            
+            # Post temperature information
+            
+            if alarm == 1: #if the alarm is active
+                Pump.value = 0 # TUrn off the pump
+                error_value = 1
+                error_msg = "Water overflow, the pump will turn off"
+                #Show error msg on adafruit io
+                print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
+                io.publish(error_msg_feed, error_msg)
+                #Change the error stat to active                 
+                print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
+                io.publish(error_feed, error_value)
+            else: 
+                #Maintain the error is not active
+                print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
+                io.publish(error_feed, error_value)
+            
+            #Publish PH value
+            
+            #Publish ORP value
+            
+        #error occurs - stop all pumps   
+        except RuntimeError as error:
+            pump.value = 0 # TUrn off the pump
+            error_value = 1
+            #upload errors
+            print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
+            io.publish(error_feed, error_value)
+            error_msg = error.args[0]
+            print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
+            io.publish(error_msg_feed, error_msg)
+            break
+
+        except Exception as error:
+            pump.value = 0 # TUrn off the pump
+            error_value = 1
+            #upload errors
+            print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
+            io.publish(error_feed, error_value)
+            error_msg = error.args[0]
+            print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
+            io.publish(error_msg_feed, error_msg)
+            raise error
+            break
+```
+## Dashboard display
+![][link-dashboard]
 
 
 
@@ -201,3 +256,4 @@ Reference:
 [link-research 1]: https://learn.eartheasy.com/articles/how-to-grow-with-aquaponics-in-5-simple-steps/
 [link-aquapros1]: https://www.youtube.com/watch?v=dFk6m-1zxyE
 [link-research 2]: http://reefkeeping.com/issues/2003-12/rhf/feature/index.htm
+[link-dashboard]: https://github.com/ronpang/Aquaponic-system/blob/main/aquaponic%20adafruit%20dashboard.PNG

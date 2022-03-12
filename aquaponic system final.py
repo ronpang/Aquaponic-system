@@ -252,6 +252,7 @@ while True:
             io.publish(temp_feed, temp)
             
             if alarm == 1:
+                pump.value = 0
                 error_value = 1
                 error_msg = "Water overflow, the pump will turn off"
                 #Show error msg on the device

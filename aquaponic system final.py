@@ -278,7 +278,6 @@ while True:
         #error occurs - stop all pumps   
         except RuntimeError as error:
             pump.value = 0
-            r_pump.value = 0
             error_value = 1
             #upload errors
             print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
@@ -290,7 +289,6 @@ while True:
 
         except Exception as error:
             pump.value = 0
-            r_pump.value = 0
             error_value = 1
             #upload errors
             print("Publishing value {0} to feed: {1}".format(error_value, error_feed))

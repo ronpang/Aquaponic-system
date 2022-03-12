@@ -14,8 +14,8 @@ from adafruit_onewire.bus import OneWireBus
 from adafruit_ds18x20 import DS18X20
 
 secrets = {
-    'aio_username' : 'ronpang',   ### Wirte Username here ###
-    'aio_key' : 'aio_gujY75PjxJhTUshNX1aNf90JQcTJ'  ### Write Active Key here ###
+    'aio_username' : 'AAAAAAAA',   ### Wirte Username here ###
+    'aio_key' : 'BBBBBBBBBBB'  ### Write Active Key here ###
     }
 
 # Set your Adafruit IO Username and Key in secrets.py

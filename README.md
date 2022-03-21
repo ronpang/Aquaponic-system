@@ -87,7 +87,7 @@ Solution:
 ## Software
 ### Bundles:
 1. [Circuit Python 7.0][link-circuit python] (it required to use 1 MB from the flash) 
-2. [Adafruit circuit python bundle][link-adafruit] - Use the latest version from adafruit bundle page
+2. [Adafruit circuit python bundle][link-adafruitbundle] - Use the latest version from adafruit bundle page
 3. [WIZnet's circuit python bundle][link-wiznet] - Use the latest version from WIZnet bundle page
 
 ### Required Libraries from adafruit bundle:
@@ -257,3 +257,6 @@ Reference:
 [link-aquapros1]: https://www.youtube.com/watch?v=dFk6m-1zxyE
 [link-research 2]: http://reefkeeping.com/issues/2003-12/rhf/feature/index.htm
 [link-dashboard]: https://github.com/ronpang/Aquaponic-system/blob/main/aquaponic%20adafruit%20dashboard.PNG
+[link-circuit python]: https://circuitpython.org/
+[link-adafruitbundle]: https://github.com/adafruit/Adafruit_CircuitPython_Bundle
+[link-wiznet]: https://github.com/Wiznet/RP2040-HAT-CircuitPython

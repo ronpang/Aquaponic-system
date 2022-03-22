@@ -152,88 +152,102 @@ Reference:
 ## Coding method
 1. Collecting data (200 samples)
 ```python
-    def collection (self,choice):
-        for i in range(self.sample): #sample size is 200 
-            if choice == 'PH': # check what kind of data are you recording
-                temp = int(PH.value) # collect data from A0
-            elif choice == 'ORP': 
-                temp = int(ORP.value) # collect data from A1
+    def collection (self,choice,counter):
+        if counter < self.sample: #check sample size
+            if choice == 'PH': #determine the data needs to input into the list
+                temp = int(PH.value) #collect data from the related analogue IO pin
+                self.P_data.append(temp)  #save it to the related list
+            elif choice == 'ORP':
+                temp = int(ORP.value)
+                self.O_data.append(temp)
             else:
                 print("error")
-            self.data.append(temp) #saved data in a array
-            time.sleep(0.02)
 ```
 2. Calculation for PH values and ORP values
 ```python
-   def calculation (self,choice):
-        if len(self.data) == self.sample: # check the sample size is it 200
-            self.total = sum(self.data) #add all the samples 
-            self.average = int(self.total/len(self.data)/64) #calculate average and set it into 1024 bit ( 5 bytes), the sensor modules was designed for arduino solution 
-            if choice == 'PH': #check the input value 
-                value = ((self.average*3300/1024)+self.ph_min)/1000 # calculate the actual inupt voltage
-                actual = -5.741*value +16.654 # covert to PH value
+    def calculation (self,choice):
+        if choice == 'PH':
+            if len(self.P_data) == self.sample: #check the sample size is correct
+                self.total = sum(self.P_data) 
+                self.average = int(self.total/len(self.P_data)/64) #finalize the sample size into 1024 bit and calculate the average
+                value = ((self.average*3300/1024)+self.ph_min)/1000 # calculate the PH value
+                actual = -5.741*value +16.654
                 print(value)
-            elif choice == 'ORP':
-                value = int(((self.average*3.3*1000/1024)+self.orp_min)) #calcuate the actual input voltage
-                actual = (value-self.mid) /2.9 #convert to ORP value
+                self.average = 0
+                self.total = 0
+                self.P_data.clear()
+        elif choice == 'ORP':
+            if len(self.O_data) == self.sample:
+                self.total = sum(self.O_data)
+                self.average = int(self.total/len(self.O_data)/64)
+                value = int(((self.average*3.3*1000/1024)+self.orp_min))
+                actual = ((value-self.mid) /3.1)+ self.orp_cal #calculate the ORP value
                 print(value)
-            self.average = 0
-            self.total = 0
-            self.data.clear()
-            return actual #return the calucated PH / ORP value
+                self.average = 0
+                self.total = 0
+                self.O_data.clear()
+        return actual
 ```
 3. Error prevention
 ```python
-#Inside the while loop
-#When there are not errors
- try: 
+while True:
+    io.loop(0.02) #check is there any updates from the MQTT channel
+    try:
             
-            alarm=pump_sensor() # Read the water level sensor
+        PH_read.collection('PH',counter) #collect data every 0.02 second
+        ORP_read.collection('ORP',counter)  
+        if counter == 200: #after received 200 samples
+            temp = int(ds18.temperature) #get the temperature value
+            print("Publishing value {0} to feed: {1}".format(temp, temp_feed))
+            io.publish(temp_feed, temp)
             
-            # Post temperature information
-            
-            if alarm == 1: #if the alarm is active
-                Pump.value = 0 # TUrn off the pump
+            PH_result = PH_read.calculation('PH') # calcuate the PH value 
+            print("Publishing value {0} to feed: {1}".format(PH_result, PH_feed))
+            io.publish(PH_feed, PH_result)
+    
+            ORP_result = int(ORP_read.calculation('ORP')) # calcuate the ORP value 
+            print("Publishing value {0} to feed: {1}".format(ORP_result, ORP_feed))
+            io.publish(ORP_feed, ORP_result)
+            counter  = -1  #reset the counter back to zero
+            #Maintain the error is not active, unless the water level is overflow    
+            if water_alarm.value == 0: #if overflow
                 error_value = 1
-                error_msg = "Water overflow, the pump will turn off"
-                #Show error msg on adafruit io
-                print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
+                pump.value = 0 #stop pump
+                error_msg = "Water overflow - check water flow"
+                print("Publishing value {0} to feed: {1}".format(error_value, error_feed)) #update the indicator
+                io.publish(error_feed, error_value)
+                print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed)) #update the message
                 io.publish(error_msg_feed, error_msg)
-                #Change the error stat to active                 
+                break #stops everything after upload the information to adafruit io
+            else:
                 print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
-                io.publish(error_feed, error_value)
-            else: 
-                #Maintain the error is not active
-                print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
-                io.publish(error_feed, error_value)
+                io.publish(error_feed, error_value)  #if the water level is under the sensor, it won't alert the error indicator
             
-            #Publish PH value
-            
-            #Publish ORP value
-            
-        #error occurs - stop all pumps   
-        except RuntimeError as error:
-            pump.value = 0 # TUrn off the pump
-            error_value = 1
-            #upload errors
-            print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
-            io.publish(error_feed, error_value)
-            error_msg = error.args[0]
-            print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
-            io.publish(error_msg_feed, error_msg)
-            break
+        counter += 1 # counter 
+     
+    #error occurs - stop all pumps   
+    except RuntimeError as error: #when software error occurs
+        pump.value = 0 
+        error_value = 1 #turn off the pump 
+        #upload errors
+        print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
+        io.publish(error_feed, error_value)
+        error_msg = error.args[0]
+        print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
+        io.publish(error_msg_feed, error_msg)
+        break #turn off everything
 
-        except Exception as error:
-            pump.value = 0 # TUrn off the pump
-            error_value = 1
-            #upload errors
-            print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
-            io.publish(error_feed, error_value)
-            error_msg = error.args[0]
-            print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
-            io.publish(error_msg_feed, error_msg)
-            raise error
-            break
+    except Exception as error: #Another possible software error occurs
+        pump.value = 0
+        error_value = 1
+        #upload errors
+        print("Publishing value {0} to feed: {1}".format(error_value, error_feed))
+        io.publish(error_feed, error_value)
+        error_msg = error.args[0]
+        print("Publishing value {0} to feed: {1}".format(error_msg, error_msg_feed))
+        io.publish(error_msg_feed, error_msg)
+        raise error
+        break
 ```
 ## Dashboard display
 ![][link-dashboard]

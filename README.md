@@ -3,6 +3,8 @@ By using WIZNet's W5100S-EVB-PICO, this aquaponic system has used circuitpython 
 
 Most of the monitoring procedure and controls could be handle throguh adafruit IO 
 
+### 🟥 [Youtube][link-aquaponic youtube]
+
 Reference code:
 1. [WIZnet][link-WIZnet circuitpython]
 2. [Adafruit][link-adafruit]
@@ -262,3 +264,4 @@ Reference:
 [link-wiznet]: https://github.com/Wiznet/RP2040-HAT-CircuitPython
 [link-waterlevel]: https://item.taobao.com/item.htm?spm=a230r.1.14.16.6a522d7cTLnbZU&id=610994738551&ns=1&abbucket=6#detail
 [link-mosfet]: https://item.taobao.com/item.htm?spm=a230r.1.14.58.5e5071efH4OSxI&id=556895473089&ns=1&abbucket=6#detail
+[link-aquaponic youtube]: https://www.youtube.com/watch?v=7pQ-9O_Bbr0

@@ -63,16 +63,16 @@ THe aquaponic system is using few monitor features with a simple physic on fluid
 ## Monitoring
 There are few important values required to monitor. These varibales is ensuring the fish tank and plants could have a good environment to live.
 
-1. PH values - Measure the PH values from 0 - 14 ([link][link-PH])
-2. ORP values - Measire the ORP values from -2000mV - 2000mV ([link][link-ORP])
-3. Temperature - Measure the Temperature by using DS18S20 onebus module ([link][link-PH])
+1. PH values - Measure the PH values from 0 - 14 ([Product link][link-PH])
+2. ORP values - Measire the ORP values from -2000mV - 2000mV ([Product link][link-ORP])
+3. Temperature - Measure the Temperature by using DS18S20 onebus module ([Product link][link-PH])
 
 ## Control
 Simple controls for ensuring the system could work normally
 
-1. Pump - special for fish tanks (USB power) ([link][link-fishpump])
-2. LED light - found a specific for plantation purpose LED light (Purple) ([link][link-led])
-      1. If you want to upgraded into a neopixel version, please go to the ([link][link-neopixel])
+1. Pump - special for fish tanks (USB power) ([Product link][link-fishpump])
+2. LED light - found a specific for plantation purpose LED light (Purple) ([Product link][link-led])
+      1. If you want to upgraded into a neopixel version, please go to the ([Neopixel link][link-neopixel])
 
 ## Error prevention
 Error May accor:
@@ -80,7 +80,7 @@ Error May accor:
 2. Plastic tubes for returning water back to fish tank may have a chance to have blockage
 
 Solution:
-1. Water level sensor to detect the water level to prevent overflow
+1. Water level sensor to detect the water level to prevent overflow ([Product link][link-waterlevel])
 2. If there are software error created, turn off the water pump
 
 
@@ -260,3 +260,4 @@ Reference:
 [link-circuit python]: https://circuitpython.org/
 [link-adafruitbundle]: https://github.com/adafruit/Adafruit_CircuitPython_Bundle
 [link-wiznet]: https://github.com/Wiznet/RP2040-HAT-CircuitPython
+[link-waterlevel]: https://item.taobao.com/item.htm?spm=a230r.1.14.16.6a522d7cTLnbZU&id=610994738551&ns=1&abbucket=6#detail

@@ -53,8 +53,8 @@ THe aquaponic system is using few monitor features with a simple physic on fluid
 ### Digital IO
 1. Water Temperature sensor (DS18S20) - Powered by PH sensor (GP0)
 2. Water level sensor (GP1)
-3. Pump - Using relay to control the pump (GP2)
-4. LED light control - Using relay to act as switch (GP3) 
+3. Pump - Using [MOSFET relay][link-mosfet] to control the pump (GP2)
+4. LED light control - Using [MOSFET relay][link-mosfet]  to act as switch (GP3) 
 
 ### Analogue IO
 1. PH - Reads the PH level (A0)
@@ -261,3 +261,4 @@ Reference:
 [link-adafruitbundle]: https://github.com/adafruit/Adafruit_CircuitPython_Bundle
 [link-wiznet]: https://github.com/Wiznet/RP2040-HAT-CircuitPython
 [link-waterlevel]: https://item.taobao.com/item.htm?spm=a230r.1.14.16.6a522d7cTLnbZU&id=610994738551&ns=1&abbucket=6#detail
+[link-mosfet]: https://item.taobao.com/item.htm?spm=a230r.1.14.58.5e5071efH4OSxI&id=556895473089&ns=1&abbucket=6#detail

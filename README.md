@@ -138,8 +138,8 @@ There are bacterias could covert ammonia into nitrates. Nitrates are the best fo
 
 Howevever, nitrates are still toxic to fish. Thus, it is important to remove these toxic materials from the fish tank.
 
-1. Ammonium  = oxidizer agent
-2. Nitrates  = reducing agent
+1. Nitrates  = oxidizer agent
+2. Ammonia  = reducing agent
 
 According to my research, having a positive voltage results means there would be a highly chance to have more food inside the fish tank.
 
